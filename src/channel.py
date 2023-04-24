@@ -22,12 +22,48 @@ class Channel:
                     self.description = elem['snippet']['description']
                     self.custom_url = elem['snippet']['customUrl']
                 if elem.get('statistics'):
-                    self.subscribers = elem['statistics']['viewCount']
-                    self.videos = elem['statistics']['subscriberCount']
+                    self.view_count = elem['statistics']['viewCount']
+                    self.subscribers = elem['statistics']['subscriberCount']
                     self.video_count = elem['statistics']['videoCount']
                 else:
                     self.title = self.description = self.custom_url = None
                     self.subscribers = self.videos = self.video_count = None
+
+    def __str__(self):
+        return f'{self.title} ({self.url})'
+
+    def __add__(self, other):
+        """Метод возвращает сумму количества подписчиков"""
+        if not self.subscribers.isdigit():
+            raise ValueError('Количество подписчиков должно быть числом')
+        return int(self.subscribers) + int(other.subscribers)
+
+    def __sub__(self, other):
+        """Метод возвращает разность количества подписчиков"""
+        if not self.subscribers.isdigit():
+            raise ValueError('Количество подписчиков должно быть числом')
+        return int(self.subscribers) - int(other.subscribers)
+
+    def __gt__(self, other):
+        """Метод возвращает True, если количество подписчиков в 'other' меньше чем в текущем экземпляре,
+        иначе — False"""
+        if not self.subscribers.isdigit():
+            raise ValueError('Количество подписчиков должно быть числом')
+        return int(self.subscribers) > int(other.subscribers)
+
+    def __ge__(self, other):
+        """Метод возвращает True, если количество подписчиков в 'other' меньше или равно чем в текущем экземпляре,
+        иначе — False"""
+        if not self.subscribers.isdigit():
+            raise ValueError('Количество подписчиков должно быть числом')
+        return int(self.subscribers) >= int(other.subscribers)
+
+    def __eq__(self, other):
+        """Метод возвращает True, если количество подписчиков в 'other' равно количеству подписчиков в текущем
+        экземпляре, иначе — False"""
+        if not self.subscribers.isdigit():
+            raise ValueError('Количество подписчиков должно быть числом')
+        return int(self.subscribers) == int(other.subscribers)
 
     @property
     def url(self):
