@@ -4,9 +4,21 @@ import os
 from googleapiclient.discovery import build
 
 
-class Channel:
-    """Класс для ютуб-канала"""
+class Youtube:
+    """Класс-миксин для хранения API-ключа и вызова метода для работы с youtube API."""
     YOUTUBE_API_KEY = os.getenv('YOUTUBE_DATA_V3_API_KEY')
+
+    @classmethod
+    def get_service(cls):
+        """
+        Класс-метод, возвращающий объект для работы с YouTube API
+        """
+        service = build('youtube', 'v3', developerKey=cls.YOUTUBE_API_KEY)
+        return service
+
+
+class Channel(Youtube):
+    """Класс для ютуб-канала"""
     currency_json_file = 'currency_json_file.json'
 
     def __init__(self, channel_id: str) -> None:
@@ -14,7 +26,7 @@ class Channel:
         if not isinstance(channel_id, str):
             raise ValueError('chanel_id should be string')
         self.__channel_id = channel_id
-        data = self.__class__.get_service().channels().list(id=self.__channel_id, part='snippet,statistics').execute()
+        data = self.get_service().channels().list(id=self.__channel_id, part='snippet,statistics').execute()
         if data.get("items"):
             for elem in data['items']:
                 if elem.get('snippet'):
@@ -73,18 +85,13 @@ class Channel:
     def channel_id(self):
         return self.__channel_id
 
-    @classmethod
-    def get_service(cls):
-        service = build('youtube', 'v3', developerKey=cls.YOUTUBE_API_KEY)
-        return service
-
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
-        info = self.__class__.get_service().channels().list(id=self.__channel_id, part='snippet,statistics').execute()
+        info = self.get_service().channels().list(id=self.__channel_id, part='snippet,statistics').execute()
         print(json.dumps(info, ensure_ascii=False, indent=2))
 
     def to_json(self):
-        file = self.__class__.currency_json_file
+        file = self.currency_json_file
         with open(file, "a") as f:
             if os.stat(file).st_size == 0:
                 json.dump([self.__dict__], f)
