@@ -1,6 +1,15 @@
 from src.channel import Youtube
 
 
+class VideoExistenceError(Exception):
+    """Класс исключений при неправильно заданном id видео на YouTube"""
+    def __init__(self, *args):
+        self.message = args[0] if args else "Такого видео не существует"
+
+    def __str__(self):
+        return self.message
+
+
 class Video(Youtube):
     """Класс для хранения информации о видео с ютуб-хостинга"""
 
@@ -11,15 +20,20 @@ class Video(Youtube):
         self.__video_id = video_id
         data = self.get_service().videos().list(part='snippet, statistics, contentDetails, topicDetails',
                                                 id=self.__video_id).execute()
-        if data['items']:
-            for elem in data['items']:
-                if elem.get('snippet'):
-                    self.title = elem['snippet']['title']
-                if elem.get('statistics'):
-                    self.viewCount = elem['statistics']['viewCount']
-                    self.likeCount = elem['statistics']['likeCount']
-                else:
-                    self.title = self.viewCount = self.likeCount = None
+        try:
+            if data['items']:
+                for elem in data['items']:
+                    if elem.get('snippet'):
+                        self.title = elem['snippet']['title']
+                    if elem.get('statistics'):
+                        self.viewCount = elem['statistics']['viewCount']
+                        self.likeCount = elem['statistics']['likeCount']
+                    else:
+                        self.title = self.view_count = self.like_count = None
+            else:
+                raise VideoExistenceError
+        except VideoExistenceError:
+            self.title = self.view_count = self.like_count = None
 
     @property
     def url_video(self):
