@@ -36,7 +36,7 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-# Получение ключей API
+# Получение ключа API
 
 - Получите ключ для работы с API YouTube на сайте [console.cloud.google.com/](https://console.cloud.google.com/).
 - Установите ключ API в переменную окружения: `YOUTUBE_DATA_V3_API_KEY`.
